@@ -41,8 +41,12 @@ without creating a hook that is dead on other machines.
 ## Consequences
 
 - Enforcement that travels with the repo: the `enterprise-gates` required check
-  (once an admin marks it required) blocks any merge that fails the gates, and
-  the pre-push hook catches the offline gates in seconds before a push.
+  (once an admin marks it required) blocks any merge that fails the gates. This
+  runs in Linux CI via the aggregator (`run-manifest-gates.mjs`), which was
+  verified to run all three gates correctly on this machine.
+- The local pre-push pre-flight is **hollow on Windows** (see limitations); it
+  does not actually protect local pushes on this platform. Merge-time CI remains
+  the real gate.
 - The directive layer is machine-local, not committed. A teammate on a fresh
   machine needs the one-time `esk-init --personal` install to get the directive;
   the committed gates still block their merges regardless.
@@ -55,6 +59,16 @@ without creating a hook that is dead on other machines.
   fails closed if no such release is published. Whether that release exists is
   **not-assessed** here (no network check was run). Source to re-run: the
   `enterprise-gates` workflow's "Fetch upstream manifest for provenance" step.
+- The pre-push hook (`.githooks/pre-push`) **silently runs zero gates on
+  Windows**. Its path-containment guard compares `abs` (from `path.resolve`,
+  backslash-separated) against `root` (from `git rev-parse --show-toplevel`,
+  forward-slash-separated on Windows), so `abs.startsWith(root + sep)` is always
+  false and every gate is skipped via `continue`; the hook then exits 0. This is
+  **observed** (re-run: instrument the guard, or note the hook prints no gate
+  output before a push). Effect: the local pre-flight gives false assurance on
+  Windows. CI is unaffected (it runs the aggregator, which normalizes paths).
+  The fix belongs upstream in the pre-push template (normalize separators before
+  the containment check), not in a hand-edit to the vendored hook here.
 - The gate self-tests copied into `test/` by `esk-genesis` resolve each gate at
   the upstream path `.claude/skills/judge-arch/scripts/check-*.mjs`, which does
   not exist in a consumer (genesis places the gates under `scripts/ci/`). So

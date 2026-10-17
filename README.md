@@ -19,9 +19,11 @@ for the setup decision and its known limitations.
   npm run gates
   ```
 
-- **Pre-push pre-flight:** the armed hook in `.githooks/pre-push` runs the
-  offline gates before each push. It arms automatically on `npm install` (the
-  `prepare` script). Bypass with `git push --no-verify`; CI still runs them.
+- **Pre-push pre-flight:** the armed hook in `.githooks/pre-push` is meant to run
+  the offline gates before each push (armed automatically on `npm install` via
+  the `prepare` script). Note: this hook currently runs zero gates on Windows
+  (a path-separator bug in the upstream template, see ADR-0001); rely on CI as
+  the real gate there. Run the gates yourself any time with `npm run gates`.
 
 - **Directive (machine-local):** the always-on skills directive is installed at
   the user level (`esk-init --personal`), not committed, because its emitter
