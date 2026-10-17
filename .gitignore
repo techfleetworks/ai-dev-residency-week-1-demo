@@ -1,0 +1,7 @@
+node_modules/
+# Machine-local Claude settings (directive hook); never committed (see ADR-0001)
+.claude/settings.local.json
+.claude/.esk-installed
+# OS / editor cruft
+.DS_Store
+Thumbs.db

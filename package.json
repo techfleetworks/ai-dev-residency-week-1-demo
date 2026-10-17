@@ -1,0 +1,13 @@
+{
+  "name": "ai-dev-residency-week-1-demo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Tech Fleet landing page (AI Dev Residency, week 1 demo).",
+  "type": "module",
+  "scripts": {
+    "prepare": "node .githooks/install-hooks.mjs",
+    "gates": "node scripts/ci/run-manifest-gates.mjs",
+    "test": "node --test"
+  },
+  "license": "UNLICENSED"
+}
