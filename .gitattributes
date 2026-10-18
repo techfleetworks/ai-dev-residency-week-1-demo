@@ -1,0 +1,28 @@
+# --- Enterprise gate scripts: pin line endings so CI can never fail on them ---
+#
+# Why this exists:
+#   gate-manifest.json records each gate/machinery script's sha256. Those hashes
+#   are computed over CRLF line endings, and the manifest is locked to the
+#   upstream release (the manifest-provenance gate verifies it, so we cannot
+#   change the hashes here). Git's default behavior checks these files out as LF
+#   on Linux CI, so the skill-gate-parity gate hashes different bytes and fails.
+#
+# The structural fix:
+#   Force every gate script to CRLF on checkout on EVERY platform and regardless
+#   of any developer's core.autocrlf setting. `eol=crlf` overrides autocrlf, so
+#   the bytes CI hashes are always the bytes the manifest recorded. A new gate
+#   script dropped into scripts/ci is covered automatically by the glob, so this
+#   cannot regress when gates are added.
+scripts/ci/*.mjs text eol=crlf
+scripts/ci/*.cjs text eol=crlf
+scripts/ci/*.js  text eol=crlf
+
+# Everything else: let git pick sensible line endings; never corrupt binaries.
+* text=auto
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
